@@ -14,7 +14,6 @@ class image_agent:
         self.tools.append(generate_json_schema(edit_image))
         self.tools.append(generate_json_schema(self.create_image_mask_file_by_description))
 
-
     def create_image_mask_file_by_description(self, image_path, description):
         detected_object = detect_object(image_path, description)
         if detected_object:
@@ -25,7 +24,7 @@ class image_agent:
         assistant = self.client.beta.assistants.create(
             model='gpt-4o-2024-08-06',
             instructions="""
-            You are an image edit assistant. Your job is helping the user edit images using the tools provided. 
+            You are an image edit assistant. Your job is helping the user edit images using the tools provided.
             If the task is to edit an image, follow the following steps:
             - First identify the object to be edited in the image.
             - Then create a mask of the object to be edited.
@@ -47,7 +46,7 @@ class image_agent:
                         order="desc",
                         limit=1,
                     )
-            
+
             if run.status == "completed":
                 return  next((
                         content.text.value
@@ -84,6 +83,6 @@ class image_agent:
 
 if __name__ == "__main__":
     agent = image_agent()
-    query = query = "Based on the 'original_image.png', replace the horse with a dairy cow standing on the grass."
+    query = "Based on the 'original_image.png', replace the horse with a dairy cow standing on the grass."
     result =agent.run(query)
     print(f"Response from LLM: {result}")
