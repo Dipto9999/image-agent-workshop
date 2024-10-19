@@ -68,7 +68,7 @@ class image_agent:
                         func_output = self.create_image_mask_file_by_description(**json.loads(tool.function.arguments))
                         func_tool_outputs.append({"tool_call_id": tool.id, "output": func_output})
                     # TODO: call edit image tool here
-                    elif tool.function.name == "edit_tool":
+                    elif tool.function.name == "edit_image":
                         func_output = edit_image(**json.loads(tool.function.arguments))
                         func_tool_outputs.append({"tool_call_id": tool.id, "output": func_output})
                     else:
@@ -86,7 +86,9 @@ class image_agent:
             print("Reached maximum reasoning turns, maybe increase the limit?")
 
 if __name__ == "__main__":
+    image_path = f"{exercise_dir}/original_image.png"
+
     agent = image_agent()
-    query = "Based on the 'original_image.png', replace the horse with a family of raccoons standing on the grass."
+    query = f"Based on '{image_path}', replace the horse with a dairy cow standing on the grass."
     result =agent.run(query)
     print(f"Response from LLM: {result}")

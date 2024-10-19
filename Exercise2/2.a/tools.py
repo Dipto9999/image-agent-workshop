@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 import os
 
 dataset_dir = "dataset"
-image_path = "Exercise1/1.a/original_image.png"
+exercise_dir = os.path.dirname(os.path.realpath(__file__))
 
 load_dotenv()
 
@@ -149,8 +149,8 @@ def extract_object_mask(image_path, detected_object):
                 r, g, b, a = mask_image.getpixel((x, y))
                 mask_image.putpixel((x, y), (r, g, b, 0))
 
-    mask_image.show()
-    output_file = f"mask.png"
+    # mask_image.show()
+    output_file = f"{exercise_dir}/mask.png"
     mask_image.save(output_file)
     return output_file
 
@@ -190,11 +190,13 @@ def edit_image( original_image_path, mask_image_path, description):
     image_data = base64.b64decode(image_json)
     image = Image.open(BytesIO(image_data))
     image.show()
-    output_file = f"edited_image.png"
+    output_file = f"{exercise_dir}/edited_image.png"
     image.save(output_file)
     return output_file
 
 if __name__ == "__main__":
+    image_path = f"{exercise_dir}/original_image.png"
+
     # Part 1: Find top k similar images by text
 
     # print('Part 1')

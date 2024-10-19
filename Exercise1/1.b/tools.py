@@ -193,7 +193,8 @@ def edit_image( original_image_path, mask_image_path, description):
     return output_file
 
 if __name__ == "__main__":
-    image_path = "Exercise1/1.a/original_image.png"
+    exercise_dir = os.path.dirname(os.path.realpath(__file__))
+    image_path = f"{exercise_dir}/original_image.png"
 
     # Part 1: Find top k similar images by text
 
