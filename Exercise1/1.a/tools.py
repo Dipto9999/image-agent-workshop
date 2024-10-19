@@ -20,8 +20,7 @@ def find_top_k_similar_images_by_text(description, k=3):
     distances = []
     for image_name in os.listdir(dataset_dir):
         image_path = os.path.join(dataset_dir, image_name)
-        image = Image.open(image_path)
-        image_embedding = model.encode(image)
+        image_embedding = model.encode(Image.open(image_path))
         # print(f"Image Embedding {image_embedding}")
 
         similarity = spatial.distance.euclidean(text_embedding, image_embedding)
@@ -30,7 +29,7 @@ def find_top_k_similar_images_by_text(description, k=3):
     # Sort by similarity in descending order
     distances.sort(key=lambda x: x[1])
 
-    # # Get the top k similar images
+    # Get the top k similar images
     top_k_images = [name for name, _ in distances[:k]]
     return top_k_images
 
@@ -212,7 +211,7 @@ if __name__ == "__main__":
     Image.open(animal_image).show()
     animal_label = classify_animal(animal_image, labels)
 
-    print(f"This is a {animal_label}")
+    print(f"This is a {animal_label}.")
 
     # Part 3: Detect object (demo)
     # image_path = "original_image.png"
