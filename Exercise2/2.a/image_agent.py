@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from details.generate_tools_schema import generate_json_schema
 from tools import *
 
+dataset_dir = "dataset"
 load_dotenv()
 
 class image_agent:
@@ -13,7 +14,7 @@ class image_agent:
         self.tools = []
         self.tools.append(generate_json_schema(self.create_image_mask_file_by_description))
         # TODO: add image edit tool
-
+        self.tools.append(generate_json_schema(edit_image))
 
     def create_image_mask_file_by_description(self, image_path, description):
         detected_object = detect_object(image_path, description)
@@ -26,7 +27,11 @@ class image_agent:
         assistant = self.client.beta.assistants.create(
             model='gpt-4o-2024-08-06',
             instructions="""
-            You are an image edit assistant. Your job is helping the user edit images using the tools provided. 
+            You are an image edit assistant. Your job is helping the user edit images using the tools provided.
+            If the query is to edit an image, please do the following:
+                1) Identify the object to be edited in the image.
+                2) Create a mask of the object to be edited.
+                3) Use the mask to edit the image.
             """,
             tools=self.tools,
             name="image-agent",
@@ -44,7 +49,7 @@ class image_agent:
                         order="desc",
                         limit=1,
                     )
-            
+
             if run.status == "completed":
                 return  next((
                         content.text.value
@@ -63,8 +68,11 @@ class image_agent:
                         func_output = self.create_image_mask_file_by_description(**json.loads(tool.function.arguments))
                         func_tool_outputs.append({"tool_call_id": tool.id, "output": func_output})
                     # TODO: call edit image tool here
+                    elif tool.function.name == "edit_tool":
+                        func_output = edit_image(**json.loads(tool.function.arguments))
+                        func_tool_outputs.append({"tool_call_id": tool.id, "output": func_output})
                     else:
-                        raise Exception("Function not available")
+                        raise Exception("Function unavailable")
 
                 # Submit the function call outputs back to OpenAI
                 run = self.client.beta.threads.runs.submit_tool_outputs_and_poll(thread_id=thread.id, run_id=run.id, tool_outputs=func_tool_outputs)
@@ -79,6 +87,6 @@ class image_agent:
 
 if __name__ == "__main__":
     agent = image_agent()
-    query = query = "Based on the 'original_image.png', replace the horse with a dairy cow standing on the grass."
+    query = "Based on the 'original_image.png', replace the horse with a family of raccoons standing on the grass."
     result =agent.run(query)
     print(f"Response from LLM: {result}")

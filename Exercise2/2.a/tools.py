@@ -9,21 +9,22 @@ import openai
 from dotenv import load_dotenv
 import os
 
-load_dotenv()
-dataset_dir = "../../dataset"
+dataset_dir = "dataset"
+image_path = "Exercise1/1.a/original_image.png"
 
-# TODO: Part 1
+load_dotenv()
+
 def find_top_k_similar_images_by_text(description, k=3):
     model = SentenceTransformer('clip-ViT-B-32')
     text_embedding = model.encode(description)
+    # print(f"Text Embedding {text_embedding}")
+
     distances = []
-
-    model = SentenceTransformer('clip-ViT-B-32')
-
     for image_name in os.listdir(dataset_dir):
         image_path = os.path.join(dataset_dir, image_name)
-        image = Image.open(image_path)
-        image_embedding = model.encode(image)
+        image_embedding = model.encode(Image.open(image_path))
+        # print(f"Image Embedding {image_embedding}")
+
         similarity = spatial.distance.euclidean(text_embedding, image_embedding)
         distances.append((image_path, similarity))
 
@@ -34,37 +35,21 @@ def find_top_k_similar_images_by_text(description, k=3):
     top_k_images = [name for name, _ in distances[:k]]
     return top_k_images
 
-# TODO: Part 2
 def classify_animal(image_path, labels):
-    """
-    Classify the animal in the given image.
-
-    This function uses a pre-trained CLIP model to classify the animal in the image
-    from a predefined set of labels: cow, horse, sheep, chicken, goat, and pig.
-
-    Args:
-        image_path (str): The path to the image file to be classified.
-
-    Returns:
-        str: The label of the animal with the highest similarity to the image.
-
-    Note:
-        This function assumes that the image contains one of the predefined animals.
-        It may not perform well on images with other animals or non-animal subjects.
-    """
     model = SentenceTransformer('clip-ViT-B-32')
+    image_embedding = model.encode(Image.open(image_path))
+    # print(f"Image Embedding {image_embedding}")
 
-    image = Image.open(f"{image_path}")
-    image_embedding = model.encode(image)
-    
     distances = []
     for label in labels:
         text_embedding = model.encode(label)
-        distance = spatial.distance.euclidean(text_embedding, image_embedding)
-        distances.append((label, distance))
-    
-    sorted_distances = sorted(distances, key=lambda x: x[1])
-    return sorted_distances[0][0]  # Return the file name with the smallest distance
+
+        similarity = spatial.distance.euclidean(text_embedding, image_embedding)
+        distances.append((label, similarity))
+
+    # Sort by similarity in descending order
+    distances.sort(key=lambda x: x[1])
+    return distances[0][0]
 
 
 def detect_object(image_path, description):
@@ -163,7 +148,7 @@ def extract_object_mask(image_path, detected_object):
             if xmin <= x < xmax and ymin <= y < ymax:
                 r, g, b, a = mask_image.getpixel((x, y))
                 mask_image.putpixel((x, y), (r, g, b, 0))
-    
+
     mask_image.show()
     output_file = f"mask.png"
     mask_image.save(output_file)
@@ -210,19 +195,29 @@ def edit_image( original_image_path, mask_image_path, description):
     return output_file
 
 if __name__ == "__main__":
-
     # Part 1: Find top k similar images by text
+
+    # print('Part 1')
     # top_k_images = find_top_k_similar_images_by_text("a cat reading a book", k=1)
-    # print(top_k_images)
+    # for i in range(len(top_k_images)):
+    #     print(f"Top {i+1} Image : {top_k_images[i]}")
+    #     Image.open(top_k_images[i]).show()
 
     # Part 2: Classify animal
 
-    # labels = ["cow", "horse", "sheep", "chicken", "goat", "pig"]
-    # animal_label = classify_animal("original_image.png", labels)
-    # print(animal_label)
+    # print('Part 2')
+    # animal_images = top_k_images + [image_path]
+    # labels = ["cow", "horse", "sheep", "cat", "chicken", "goat", "pig"]
+
+    # for image in animal_images:
+    #     animal_label = classify_animal(image, labels)
+    #     Image.open(image).show()
+
+    #     print(f"This is a {animal_label}.")
 
     # Part 3: Detect object (demo)
-    image_path = "original_image.png"
+
+    print('Part 3')
     detected_object = detect_object(image_path, "horse")
     if detected_object:
         draw_detected_object(image_path, detected_object)
