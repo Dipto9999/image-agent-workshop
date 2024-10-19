@@ -39,7 +39,6 @@ Welcome to our AI agent Workshop! This repository contains all the materials and
 
 ## Running the code
 ```
-cd Exercise1/1.a
-python tools.py
+python Exercise1/1.a/tools.py
 ```
 If not running into errors, then you are all set. Start hacking!
