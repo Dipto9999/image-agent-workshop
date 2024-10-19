@@ -193,10 +193,11 @@ def edit_image( original_image_path, mask_image_path, description):
     return output_file
 
 if __name__ == "__main__":
+    image_path = "Exercise1/1.a/original_image.png"
 
     # Part 1: Find top k similar images by text
 
-    print('Exercise 1')
+    print('Part 1')
     top_k_images = find_top_k_similar_images_by_text("a cat reading a book", k=1)
     for i in range(len(top_k_images)):
         print(f"Top {i+1} Image : {top_k_images[i]}")
@@ -204,19 +205,20 @@ if __name__ == "__main__":
 
     # Part 2: Classify animal
 
-    print('Exercise 2')
-    animal_images = top_k_images + ["Exercise1/1.a/original_image.png"]
-    labels = ["cow", "horse", "sheep", "cat", "chicken", "goat", "pig"]
+    # print('Part 2')
+    # animal_images = top_k_images + [image_path]
+    # labels = ["cow", "horse", "sheep", "cat", "chicken", "goat", "pig"]
 
-    for image in animal_images:
-        animal_label = classify_animal(image, labels)
-        Image.open(image).show()
+    # for image in animal_images:
+    #     animal_label = classify_animal(image, labels)
+    #     Image.open(image).show()
 
-        print(f"This is a {animal_label}.")
+    #     print(f"This is a {animal_label}.")
 
     # Part 3: Detect object (demo)
-    # image_path = "original_image.png"
+
+    # print('Part 3')
     # detected_object = detect_object(image_path, "horse")
     # if detected_object:
     #     draw_detected_object(image_path, detected_object)
-    #     # extract_object_mask(image_path, detected_object)
+    #     extract_object_mask(image_path, detected_object)

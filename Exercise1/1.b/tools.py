@@ -10,19 +10,19 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()
-dataset_dir = "../../dataset"
+dataset_dir = "dataset"
 
 def find_top_k_similar_images_by_text(description, k=3):
     model = SentenceTransformer('clip-ViT-B-32')
     text_embedding = model.encode(description)
+    # print(f"Text Embedding {text_embedding}")
+
     distances = []
-
-    model = SentenceTransformer('clip-ViT-B-32')
-
     for image_name in os.listdir(dataset_dir):
         image_path = os.path.join(dataset_dir, image_name)
-        image = Image.open(image_path)
-        image_embedding = model.encode(image)
+        image_embedding = model.encode(Image.open(image_path))
+        # print(f"Image Embedding {image_embedding}")
+
         similarity = spatial.distance.euclidean(text_embedding, image_embedding)
         distances.append((image_path, similarity))
 
@@ -33,9 +33,21 @@ def find_top_k_similar_images_by_text(description, k=3):
     top_k_images = [name for name, _ in distances[:k]]
     return top_k_images
 
-# TODO: Part 2
 def classify_animal(image_path, labels):
-    ...
+    model = SentenceTransformer('clip-ViT-B-32')
+    image_embedding = model.encode(Image.open(image_path))
+    # print(f"Image Embedding {image_embedding}")
+
+    distances = []
+    for label in labels:
+        text_embedding = model.encode(label)
+
+        similarity = spatial.distance.euclidean(text_embedding, image_embedding)
+        distances.append((label, similarity))
+
+    # Sort by similarity in descending order
+    distances.sort(key=lambda x: x[1])
+    return distances[0][0]
 
 
 def detect_object(image_path, description):
@@ -134,7 +146,7 @@ def extract_object_mask(image_path, detected_object):
             if xmin <= x < xmax and ymin <= y < ymax:
                 r, g, b, a = mask_image.getpixel((x, y))
                 mask_image.putpixel((x, y), (r, g, b, 0))
-    
+
     mask_image.show()
     output_file = f"mask.png"
     mask_image.save(output_file)
@@ -181,20 +193,32 @@ def edit_image( original_image_path, mask_image_path, description):
     return output_file
 
 if __name__ == "__main__":
+    image_path = "Exercise1/1.a/original_image.png"
 
     # Part 1: Find top k similar images by text
-    top_k_images = find_top_k_similar_images_by_text("a cat reading a book", k=1)
-    print(top_k_images)
+
+    # print('Part 1')
+    # for i in range(len(top_k_images)):
+    #     print(f"Top {i+1} Image : {top_k_images[i]}")
+    #     Image.open(top_k_images[i]).show()
 
     # Part 2: Classify animal
 
-    # labels = ["cow", "horse", "sheep", "chicken", "goat", "pig"]
-    # animal_label = classify_animal("original_image.png", labels)
-    # print(animal_label)
+    print('Part 2')
+    top_k_images = find_top_k_similar_images_by_text("a cat reading a book", k=1)
+    animal_images = top_k_images + [image_path]
+    labels = ["cow", "horse", "sheep", "cat", "chicken", "goat", "pig"]
+
+    for image in animal_images:
+        animal_label = classify_animal(image, labels)
+        Image.open(image).show()
+
+        print(f"This is a {animal_label}.")
 
     # Part 3: Detect object (demo)
-    # image_path = "original_image.png"
+
+    # print('Part 3')
     # detected_object = detect_object(image_path, "horse")
     # if detected_object:
     #     draw_detected_object(image_path, detected_object)
-    #     # extract_object_mask(image_path, detected_object)
+    #     extract_object_mask(image_path, detected_object)
