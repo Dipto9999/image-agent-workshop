@@ -205,13 +205,14 @@ if __name__ == "__main__":
     # Part 2: Classify animal
 
     print('Exercise 2')
-    animal_image = "Exercise1/1.a/original_image.png"
-    labels = ["cow", "horse", "sheep", "chicken", "goat", "pig"]
+    animal_images = top_k_images + ["Exercise1/1.a/original_image.png"]
+    labels = ["cow", "horse", "sheep", "cat", "chicken", "goat", "pig"]
 
-    Image.open(animal_image).show()
-    animal_label = classify_animal(animal_image, labels)
+    for image in animal_images:
+        animal_label = classify_animal(image, labels)
+        Image.open(image).show()
 
-    print(f"This is a {animal_label}.")
+        print(f"This is a {animal_label}.")
 
     # Part 3: Detect object (demo)
     # image_path = "original_image.png"
