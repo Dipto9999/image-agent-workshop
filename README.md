@@ -4,7 +4,7 @@
 Welcome to our AI agent Workshop! This repository contains all the materials and code you'll need for the hands-on part of this workshop. In this workshop, you'll learn how to design an image editing agent does in-painting, based on natural language instructions.
 
 ## Prerequisites
-- Python 3.10+
+- Python 3.10
 - OpenAI API key
 
 ## Installation
